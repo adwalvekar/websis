@@ -132,7 +132,10 @@ def getDetails(html):
 def getGrades(br):
 	links = br.parsed.find_all(title='Product Category Id')
 	i = 1
+	data = {}
+	data['Details'] = {}
 	for link in links:
+		num = len(links)
 		url = 'http://websismit.manipal.edu' + link['href']
 		name = 'cc_TermGradeBookSummary_productName_'
 		credit = 'cc_TermGradeBookSummary_credit_'
@@ -140,11 +143,12 @@ def getGrades(br):
 		br.open(url)
 		gradehtml = br.parsed
 		form = br.get_form(method='post')
-		data = {}
-		data['NoOfCredits'] = form['pcredits'].value
-		data['GPA'] = form['ptermResultScore'].value
-		data['Details'] = []
 		j = 1
+		st = "Semester " + str(num - i + 1)
+		data['Details'][st] = {}
+		data['Details'][st]['NoOfCredits'] = form['pcredits'].value
+		data['Details'][st]['GPA'] = form['ptermResultScore'].value
+		data['Details'][st]['Grades'] = []
 		while True:
 			subject = br.parsed.find('span', attrs={'id':name + str(j)})
 			credits = br.parsed.find('span', attrs={'id':credit + str(j)})
@@ -154,9 +158,9 @@ def getGrades(br):
 			temp = {}
 			temp['Subject'] = subject.text.strip()
 			temp['Credits'] = credits.text.strip()
-			temp['Grade'] = grades.text.strip() 
+			temp['Grade'] = grades.text.strip()
 			j+=1
-			data['Details'].append(temp)
+			data['Details'][st]['Grades'].append(temp)
 		br.back()
 		i+=1
 	return data

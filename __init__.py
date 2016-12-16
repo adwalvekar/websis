@@ -11,4 +11,4 @@ def show():
 	a = browse.show(reg,bdate)
 	return json.dumps(a)
 if __name__=='__main__':
-	app.run()
+	app.run(debug = True)
