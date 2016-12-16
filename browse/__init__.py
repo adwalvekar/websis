@@ -22,12 +22,14 @@ def show(RegNo, bdate):
 		scores = getScores(br.parsed)
 		attendence = getAttendence(br.parsed)
 		gpa = getGPA(br.parsed)
+		grades = getGrades(br)
 		data = {}
 		details['Branch'] = gpa.keys()[-1]
 		data['Scores'] = scores
 		data['Attendance'] = attendence
 		data['GPA'] = gpa
 		data['User Data'] = details
+		data['Grades'] = grades
 		return data
 	else:
 		return {"status":False, "Description": "Not Available2"}
@@ -63,7 +65,6 @@ def getScores(html):
 		for x in l:
 			if 'Internal' in x:
 				y.append(int(re.search(r'\d+', x).group()))
-	print str(y)
 	for tables in tableset:
 		headings = [th.get_text().strip('\n').strip(' ').title() for th in tables.find("tr").find_all("th")]
 		datasets = []
@@ -82,7 +83,6 @@ def getScores(html):
 			f =temp
 			final_list.append(f)
 			text = 'Internal Assesment '+str(y[ia])
-			print str(y[ia])
 		tot_set[text] = final_list
 		ia+=1
 	return tot_set
@@ -108,7 +108,6 @@ def getScores2():
 		for x in l:
 			if 'Internal' in x:
 				y.append(int(re.search(r'\d+', x).group()))
-	print str(y)
 def getGPA(html):
 	tables =  html.find("table", attrs={"id":"ProgramAdmissionItemSummary_table"})
 	gpa = []
@@ -129,3 +128,35 @@ def getDetails(html):
 	name = html.find('span', attrs = {'id':"cc_ProfileTitle_name"}).get_text().strip('\n').strip(' ').title()
 	regno = html.find('span', attrs = {'id':"cc_ProfileTitle_idValue"}).get_text().strip('\n').strip(' ').title()
 	return {'Name':name,'Registration Number':regno}
+
+def getGrades(br):
+	links = br.parsed.find_all(title='Product Category Id')
+	i = 1
+	for link in links:
+		url = 'http://websismit.manipal.edu' + link['href']
+		name = 'cc_TermGradeBookSummary_productName_'
+		credit = 'cc_TermGradeBookSummary_credit_'
+		grade = 'cc_TermGradeBookSummary_pfinalResult_'
+		br.open(url)
+		gradehtml = br.parsed
+		form = br.get_form(method='post')
+		data = {}
+		data['NoOfCredits'] = form['pcredits'].value
+		data['GPA'] = form['ptermResultScore'].value
+		data['Details'] = []
+		j = 1
+		while True:
+			subject = br.parsed.find('span', attrs={'id':name + str(j)})
+			credits = br.parsed.find('span', attrs={'id':credit + str(j)})
+			grades = br.parsed.find('span', attrs={'id':grade + str(j)})
+			if subject is None:
+				break
+			temp = {}
+			temp['Subject'] = subject.text.strip()
+			temp['Credits'] = credits.text.strip()
+			temp['Grade'] = grades.text.strip() 
+			j+=1
+			data['Details'].append(temp)
+		br.back()
+		i+=1
+	return data
