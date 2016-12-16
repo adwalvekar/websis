@@ -10,9 +10,5 @@ def show():
 	bdate = request.form['bdate']
 	a = browse.show(reg,bdate)
 	return json.dumps(a)
-@app.route('/debug', methods = ['POST'])
-def debug():
-	browse.getScores2()
-	return 'OK'
 if __name__=='__main__':
 	app.run()
