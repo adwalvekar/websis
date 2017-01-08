@@ -135,32 +135,35 @@ def getGrades(br):
 	data = {}
 	data['Details'] = {}
 	for link in links:
-		num = len(links)
-		url = 'http://websismit.manipal.edu' + link['href']
-		name = 'cc_TermGradeBookSummary_productName_'
-		credit = 'cc_TermGradeBookSummary_credit_'
-		grade = 'cc_TermGradeBookSummary_pfinalResult_'
-		br.open(url)
-		gradehtml = br.parsed
-		form = br.get_form(method='post')
-		j = 1
-		st = "Semester " + str(num - i + 1)
-		data['Details'][st] = {}
-		data['Details'][st]['NoOfCredits'] = form['pcredits'].value
-		data['Details'][st]['GPA'] = form['ptermResultScore'].value
-		data['Details'][st]['Grades'] = []
-		while True:
-			subject = br.parsed.find('span', attrs={'id':name + str(j)})
-			credits = br.parsed.find('span', attrs={'id':credit + str(j)})
-			grades = br.parsed.find('span', attrs={'id':grade + str(j)})
-			if subject is None:
-				break
-			temp = {}
-			temp['Subject'] = subject.text.strip()
-			temp['Credits'] = credits.text.strip()
-			temp['Grade'] = grades.text.strip()
-			j+=1
-			data['Details'][st]['Grades'].append(temp)
-		br.back()
-		i+=1
+		try:
+			num = len(links)
+			url = 'http://websismit.manipal.edu' + link['href']
+			name = 'cc_TermGradeBookSummary_productName_'
+			credit = 'cc_TermGradeBookSummary_credit_'
+			grade = 'cc_TermGradeBookSummary_pfinalResult_'
+			br.open(url)
+			gradehtml = br.parsed
+			form = br.get_form(method='post')
+			j = 1
+			st = "Semester " + str(num - i + 1)
+			data['Details'][st] = {}
+			data['Details'][st]['NoOfCredits'] = form['pcredits'].value
+			data['Details'][st]['GPA'] = form['ptermResultScore'].value
+			data['Details'][st]['Grades'] = []
+			while True:
+				subject = br.parsed.find('span', attrs={'id':name + str(j)})
+				credits = br.parsed.find('span', attrs={'id':credit + str(j)})
+				grades = br.parsed.find('span', attrs={'id':grade + str(j)})
+				if subject is None:
+					break
+				temp = {}
+				temp['Subject'] = subject.text.strip()
+				temp['Credits'] = credits.text.strip()
+				temp['Grade'] = grades.text.strip()
+				j+=1
+				data['Details'][st]['Grades'].append(temp)
+			br.back()
+			i+=1
+		except Exception as e:
+			print e
 	return data
