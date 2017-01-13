@@ -145,7 +145,7 @@ def getGrades(br):
 			gradehtml = br.parsed
 			form = br.get_form(method='post')
 			j = 1
-			st = "Semester " + str(num - i + 1)
+			st = "Semester " + str(num - i)
 			data['Details'][st] = {}
 			data['Details'][st]['NoOfCredits'] = form['pcredits'].value
 			data['Details'][st]['GPA'] = form['ptermResultScore'].value
