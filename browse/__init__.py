@@ -23,6 +23,7 @@ def show(RegNo, bdate):
 		attendence = getAttendence(br.parsed)
 		gpa = getGPA(br.parsed)
 		grades = getGrades(br)
+		credits = getCredits(br.parsed)
 		data = {}
 		details['Branch'] = gpa.keys()[-1]
 		data['Scores'] = scores
@@ -30,6 +31,7 @@ def show(RegNo, bdate):
 		data['GPA'] = gpa
 		data['User Data'] = details
 		data['Grades'] = grades
+		data['Credits'] = credits
 		return data
 	else:
 		return {"status":False, "Description": "Not Available2"}
@@ -167,3 +169,24 @@ def getGrades(br):
 		except Exception as e:
 			print e
 	return data
+def getCredits(html):
+	tables =  html.find("table", attrs={"id":"ListTermEnrollment_table"})
+	headings = [th.get_text().strip('\n').strip(' ').title() for th in tables.find("tr").find_all("th")]
+	headings.pop()
+	datasets = []
+	for row in tables.find_all("tr")[1:]:
+		dataset = zip(headings, (td.get_text().title() for td in row.find_all("td")))
+		a=[]
+		for td in row.find_all("td"):
+			text = td.get_text().strip('\n').strip(' ').title()
+			a.append(text) 
+		a.pop()
+		datasets.append(a)
+	final_list = []
+	for i in range(0,len(datasets)):
+		temp = {}
+		for j in range(0,len(headings)):
+			temp[headings[j]] = datasets[i][j]
+		f = temp
+		final_list.append(f)
+	return final_list
