@@ -1,6 +1,46 @@
 from robobrowser import RoboBrowser
 import json
 import re	
+
+def getHTML(RegNo, bdate):
+	url = "http://websismit.manipal.edu/websis/control/clearSession"
+	br = RoboBrowser(history=True,parser='html.parser')
+	try:
+		br.open(url)
+	except Exception as e:
+		return {"status":False, "Description": "Not Available"}
+	form = br.get_form(method = 'post')
+	if form is not None:
+		form
+		form['idValue'].value = RegNo
+		form['birthDate_i18n'].value = bdate
+		form['birthDate'].value = bdate
+		br.submit_form(form)
+		if br.parsed.find("table") is None:
+			return {'status':False,'Description':"Invalid login"}
+		details = getDetails(br.parsed)
+		br.open('http://websismit.manipal.edu/websis/control/ListCTPEnrollment')
+		return br
+
+def getHTML2(RegNo, bdate):
+	url = "http://websismit.manipal.edu/websis/control/clearSession"
+	br = RoboBrowser(history=True,parser='html.parser')
+	try:
+		br.open(url)
+	except Exception as e:
+		return {"status":False, "Description": "Not Available"}
+	form = br.get_form(method = 'post')
+	if form is not None:
+		form
+		form['idValue'].value = RegNo
+		form['birthDate_i18n'].value = bdate
+		form['birthDate'].value = bdate
+		br.submit_form(form)
+		if br.parsed.find("table") is None:
+			return {'status':False,'Description':"Invalid login"}
+		details = getDetails(br.parsed)
+		return details
+
 def show(RegNo, bdate):
 	url = "http://websismit.manipal.edu/websis/control/clearSession"
 	br = RoboBrowser(history=True,parser='html.parser')
@@ -88,28 +128,6 @@ def getScores(html):
 		tot_set[text] = final_list
 		ia+=1
 	return tot_set
-def getScores2():
-	url = "http://websismit.manipal.edu/websis/control/clearSession"
-	br = RoboBrowser(history=True,parser='html.parser')
-	br.open(url)
-	form = br.get_form(method = 'post')
-	if form is not None:
-		form
-		form['idValue'].value = '140953332'
-		form['birthDate_i18n'].value = '1995-11-06'
-		form['birthDate'].value = '1995-11-06'
-		br.submit_form(form)
-		if br.parsed.find("table") is None:
-			return {'status':False,'Description':"Invalid login"}
-		details = getDetails(br.parsed)
-		br.open('http://websismit.manipal.edu/websis/control/ListCTPEnrollment')
-	divset =  br.parsed.find_all("div", attrs={"class":"screenlet"})
-	y = []
-	for i in divset:
-		l =i.find("li", attrs={"class":"h3"})
-		for x in l:
-			if 'Internal' in x:
-				y.append(int(re.search(r'\d+', x).group()))
 def getGPA(html):
 	tables =  html.find("table", attrs={"id":"ProgramAdmissionItemSummary_table"})
 	gpa = []
