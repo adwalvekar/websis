@@ -75,6 +75,38 @@ def show(RegNo, bdate):
 		return data
 	else:
 		return {"status":False, "Description": "Not Available2"}
+
+def show2me2(RegNo, bdate):
+	url = "http://websismit.manipal.edu/websis/control/clearSession"
+	br = RoboBrowser(history=True,parser='html.parser')
+	try:
+		br.open(url)
+	except Exception as e:
+		return {"status":False, "Description": "Not Available"}
+	form = br.get_form(method = 'post')
+	if form is not None:
+		form
+		form['idValue'].value = RegNo
+		form['birthDate_i18n'].value = bdate
+		form['birthDate'].value = bdate
+		br.submit_form(form)
+		if br.parsed.find("table") is None:
+			return {'status':False,'Description':"Invalid login"}
+		details = getDetails(br.parsed)
+		br.open('http://websismit.manipal.edu/websis/control/ListCTPEnrollment')
+		scores = getScores(br.parsed)
+		attendence = getAttendence(br.parsed)
+		credits = getCredits(br.parsed)
+		data = {}
+		gpa = getGPA(br.parsed)
+		details['Branch'] = gpa.keys()[-1]
+		data['Scores'] = scores
+		data['Attendance'] = attendence
+		data['User Data'] = details
+		data['Credits'] = credits
+		return data
+	else:
+		return {"status":False, "Description": "Not Available2"}
 def getAttendence(html):
 	tables =  html.find("table", attrs={"id":"ListAttendanceSummary_table"})
 	headings = [th.get_text().strip('\n').strip(' ').title() for th in tables.find("tr").find_all("th")]
