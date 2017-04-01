@@ -20,4 +20,4 @@ def attendence():
 	return json.dumps(a)
 	
 if __name__=='__main__':
-	app.run(debug = True)
+	app.run()
