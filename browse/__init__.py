@@ -183,7 +183,8 @@ def getDetails(html):
 
 def getGrades(br):
 	links = br.parsed.find_all(title='Product Category Id')
-	i = 1
+	#Change i to 0 when next sem is registered
+	i = 0
 	data = {}
 	data['Details'] = {}
 	for link in links:
